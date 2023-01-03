@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32407.343
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{B7C29C9F-BAB1-4194-9456-A7CEAA6EDDCE}") = "DoUntilFilter", "Source\DoUntilFilter.csproj", "{4C9271A3-EF8A-44A8-AE39-292F8A2CF524}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4C9271A3-EF8A-44A8-AE39-292F8A2CF524}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C9271A3-EF8A-44A8-AE39-292F8A2CF524}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C9271A3-EF8A-44A8-AE39-292F8A2CF524}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C9271A3-EF8A-44A8-AE39-292F8A2CF524}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {215063C4-6D4F-4A86-B9DD-1BB2EEBCB4E7}
+	EndGlobalSection
+EndGlobal

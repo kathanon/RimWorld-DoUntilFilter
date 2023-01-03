@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LanguageData>
+    <!-- UI -->
+	<kathanon.DoUntilFilter.CountingFilter>Counting filter:</kathanon.DoUntilFilter.CountingFilter>
+	<kathanon.DoUntilFilter.VanillaFilter>Vanilla</kathanon.DoUntilFilter.VanillaFilter>
+	<kathanon.DoUntilFilter.Edit>Edit...</kathanon.DoUntilFilter.Edit>
+	<kathanon.DoUntilFilter.CountedItems>Counted items</kathanon.DoUntilFilter.CountedItems>
+	<kathanon.DoUntilFilter.Nothing>Nothing</kathanon.DoUntilFilter.Nothing>
+	<kathanon.DoUntilFilter.Mixed>(specific list)</kathanon.DoUntilFilter.Mixed>
+	<kathanon.DoUntilFilter.Automatic>Automatic</kathanon.DoUntilFilter.Automatic>
+	<kathanon.DoUntilFilter.ButtonCustom>Custom</kathanon.DoUntilFilter.ButtonCustom>
+	<kathanon.DoUntilFilter.MenuCustom>Custom...</kathanon.DoUntilFilter.MenuCustom>
+
+    <!-- UI - parameterized -->
+	<kathanon.DoUntilFilter.AndMore>(and {0} more)</kathanon.DoUntilFilter.AndMore>
+</LanguageData>
