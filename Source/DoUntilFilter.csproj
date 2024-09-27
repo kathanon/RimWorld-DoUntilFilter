@@ -4,7 +4,9 @@
   <PropertyGroup>
     <ModName>DoUntilFilter</ModName>
     <ModId>kathanon.$(ModName)</ModId>
-    <MultiVersion>false</MultiVersion>
+    <MultiVersion>true</MultiVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
@@ -15,7 +17,7 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <TargetFrameworkProfile />
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>12.0</LangVersion>
   </PropertyGroup>
   <!-- Import base build file -->
   <Import Project="RimWorld.targets" />
@@ -63,10 +65,16 @@
     <Compile Include="Compat_BetterWorkbenchManagement.cs" />
     <Compile Include="BillState.cs" />
     <Compile Include="Dialog_Filter.cs" />
+    <Compile Include="GenericDialog.cs" />
     <Compile Include="Patches.cs" />
-    <Compile Include="RecipeWorkerCounter_Abs.cs" />
-    <Compile Include="RecipeWorkerCounter_Auto.cs" />
-    <Compile Include="RecipeWorkerCounter_Custom.cs" />
+    <Compile Include="RecipeWorkerCounter_Abstract.cs" />
+    <Compile Include="RecipeWorkerCounter_DefAbstract.cs" />
+    <Compile Include="RecipeWorkerCounter_DefAuto.cs" />
+    <Compile Include="RecipeWorkerCounter_DefCustom.cs" />
+    <Compile Include="RecipeWorkerCounter_Defer.cs" />
+    <Compile Include="RecipeWorkerCounter_TagsAbstract.cs" />
+    <Compile Include="RecipeWorkerCounter_TagsAuto.cs" />
+    <Compile Include="RecipeWorkerCounter_TagsCustom.cs" />
     <Compile Include="State.cs" />
     <Compile Include="Strings.cs" />
     <Compile Include="Main.cs" />
@@ -78,5 +86,14 @@
     <None Include="$(ModFiles)\**" CopyToOutputDirectory="PreserveNewest">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
+  <!-- Use PolySharp to enable runtime-agnostic language features -->
+  <Import Project="..\packages\PolySharp.1.10.0\build\PolySharp.targets" Condition="Exists('..\packages\PolySharp.1.10.0\build\PolySharp.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\PolySharp.1.10.0\build\PolySharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PolySharp.1.10.0\build\PolySharp.targets'))" />
+  </Target>
 </Project>

@@ -7,44 +7,24 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
+using Verse.AI;
 
 namespace DoUntilFilter {
     [HarmonyPatch]
     public static class Patches {
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(RecipeWorkerCounter_ButcherAnimals), nameof(RecipeWorkerCounter.CountProducts))]
-        public static bool CountProducts_Butcher(Bill_Production bill, ref int __result)
-            => State.DoFunc(bill, x => x.CountProducts(bill), ref __result);
-
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(RecipeWorkerCounter_MakeStoneBlocks), nameof(RecipeWorkerCounter.CountProducts))]
-        public static bool CountProducts_Blocks(Bill_Production bill, ref int __result)
-            => State.DoFunc(bill, x => x.CountProducts(bill), ref __result);
-
-
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(RecipeWorkerCounter_ButcherAnimals), nameof(RecipeWorkerCounter.ProductsDescription))]
-        public static bool ProductsDescription_Butcher(Bill_Production bill, ref string __result)
-            => State.DoFunc(bill, x => x.ProductsDescription(bill), ref __result);
-
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(RecipeWorkerCounter_MakeStoneBlocks), nameof(RecipeWorkerCounter.ProductsDescription))]
-        public static bool ProductsDescription_Blocks(Bill_Production bill, ref string __result)
-            => State.DoFunc(bill, x => x.ProductsDescription(bill), ref __result);
-
-
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(RecipeWorkerCounter_ButcherAnimals), nameof(RecipeWorkerCounter.CanPossiblyStoreInStockpile))]
-        public static bool CanPossiblyStoreInStockpile_Butcher(
-                Bill_Production bill, Zone_Stockpile stockpile, ref bool __result)
-            => State.DoFunc(bill, x => x.CanPossiblyStoreInStockpile(bill, stockpile), ref __result);
-
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(RecipeWorkerCounter_MakeStoneBlocks), nameof(RecipeWorkerCounter.CanPossiblyStoreInStockpile))]
-        public static bool CanPossiblyStoreInStockpile_Blocks(
-                Bill_Production bill, Zone_Stockpile stockpile, ref bool __result)
-            => State.DoFunc(bill, x => x.CanPossiblyStoreInStockpile(bill, stockpile), ref __result);
-
+        [HarmonyPatch(typeof(RecipeDef), nameof(RecipeDef.WorkerCounter), MethodType.Getter)]
+        public static void WorkerCounter(RecipeDef __instance, ref RecipeWorkerCounter ___workerCounterInt) {
+            if (___workerCounterInt != null || !BillState.UseFor(__instance)) return;
+            var clazz = __instance.workerCounterClass;
+            if (clazz == typeof(RecipeWorkerCounter_MakeStoneBlocks)) {
+                ___workerCounterInt = RecipeWorkerCounter_Defer.Stone(__instance);
+            } else if (clazz == typeof(RecipeWorkerCounter_ButcherAnimals)) { 
+                ___workerCounterInt = RecipeWorkerCounter_Defer.Butcher(__instance);
+            } else if (clazz == typeof(RecipeWorkerCounter)) {
+                ___workerCounterInt = RecipeWorkerCounter_Defer.Other(__instance);
+            }
+        }
 
 
         private static BillState currentGUIState = null;

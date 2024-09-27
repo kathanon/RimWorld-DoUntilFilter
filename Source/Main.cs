@@ -13,8 +13,6 @@ namespace DoUntilFilter {
             harmony.PatchAll();
         }
 
-        // TODO: translation support
-
         public Main(ModContentPack content) : base(content) {
             Instance = this; 
         }

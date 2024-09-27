@@ -7,32 +7,38 @@ using System.Threading.Tasks;
 using Verse;
 
 namespace DoUntilFilter {
-    public class RecipeWorkerCounter_Custom : RecipeWorkerCounter_Abs {
+    public class RecipeWorkerCounter_DefCustom : RecipeWorkerCounter_DefAbstract {
         private const int ID = 10;
         private ThingFilter filter;
 
         public static FloatMenuOption MenuOption(BillState state) 
-            => new FloatMenuOption(Strings.MenuCustom, () => SetFor(state, true));
+            => new(Strings.MenuCustom, () => SetFor(state, true));
 
         public static void SetFor(BillState state, bool edit) {
-            if (!(state.counter is RecipeWorkerCounter_Custom)) {
-                state.counter = new RecipeWorkerCounter_Custom(state.bill);
+            if (state.counter is not RecipeWorkerCounter_DefCustom) {
+                var counter = new RecipeWorkerCounter_DefCustom();
+                var parent = counter.ParentFilter(state.bill);
+                if (parent == null) return;
+                counter.InitFrom(parent);
+                state.counter = counter;
             }
             if (edit) state.counter.Edit(state.bill);
         }
 
-        public static RecipeWorkerCounter_Custom For(int id) {
-            if (id == ID) return new RecipeWorkerCounter_Custom();
-            return null;
-        }
+        public static RecipeWorkerCounter_DefCustom For(int id) 
+            => (id == ID) ? new() : null;
 
-        public RecipeWorkerCounter_Custom() {
+        public RecipeWorkerCounter_DefCustom() {
             filter = new ThingFilter();
             id = ID;
         }
 
-        public RecipeWorkerCounter_Custom(Bill_Production bill) : this() {
-            filter.CopyAllowancesFrom(ParentFilter(bill));
+        public RecipeWorkerCounter_DefCustom(Bill_Production bill) : this() {
+            InitFrom(ParentFilter(bill));
+        }
+
+        private void InitFrom(ThingFilter parentFilter) {
+            filter.CopyAllowancesFrom(parentFilter);
         }
 
         public override string Label => Strings.ButtonCustom;
@@ -46,9 +52,9 @@ namespace DoUntilFilter {
             }
         }
 
-        public override void CopyTo(ref RecipeWorkerCounter_Abs counter, Bill_Production bill) {
-            if (!(counter is RecipeWorkerCounter_Custom other)) {
-                counter = other = new RecipeWorkerCounter_Custom(bill);
+        public override void CopyTo(ref RecipeWorkerCounter_Abstract counter, Bill_Production bill) {
+            if (counter is not RecipeWorkerCounter_DefCustom other) {
+                counter = other = new(bill);
             }
             other.filter.CopyAllowancesFrom(filter);
         }
@@ -57,9 +63,10 @@ namespace DoUntilFilter {
             Scribe_Deep.Look(ref filter, "filter");
         }
 
-        protected override HashSet<ThingDef> ToCountFor(Bill_Production bill) {
+        protected override void Update(Bill_Production bill) {
             ParentFilter(bill);
-            return filter.AllowedThingDefs.ToHashSet();
+            toCount.Clear();
+            toCount.AddRange(filter.AllowedThingDefs);
         }
 
         private ThingFilter ParentFilter(Bill_Production bill) {
@@ -77,7 +84,7 @@ namespace DoUntilFilter {
 
                 return parent;
             } else {
-                Log.Error($"Bill {bill.LabelCap} has counter {bill.recipe.workerCounterClass.Name}, which is not supported.");
+                Log.Error($"Bill {bill.LabelCap} has counter {bill.recipe.workerCounterClass.FullName}, which is not supported.");
                 return null;
             }
         }

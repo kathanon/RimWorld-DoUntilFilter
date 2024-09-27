@@ -6,19 +6,34 @@ using Verse;
 
 namespace DoUntilFilter {
     public class BillState {
+        private static HashSet<Type> defWorkers =
+            [ typeof(RecipeWorkerCounter_MakeStoneBlocks), typeof(RecipeWorkerCounter_ButcherAnimals) ];
+
         public const float ButtonHeight = 26f;
         public const float Margin       =  6f;
 
         public static BillState Create(Bill_Production bill) {
             var state = new BillState {
                 bill = bill,
+                useDefCounter = UsesDefCounter(bill.recipe),
             };
-            RecipeWorkerCounter_Auto.SetFor(state);
+            RecipeWorkerCounter_Abstract.SetDefaultFor(state);
             return state;
         }
 
-        public RecipeWorkerCounter_Abs counter = null;
+        public static bool UseFor(RecipeDef recipe) 
+            => recipe != null && (UsesDefCounter(recipe) || UsesTagsCounter(recipe));
+
+        private static bool UsesDefCounter(RecipeDef recipe) 
+            => defWorkers.Contains(recipe.workerCounterClass);
+
+        private static bool UsesTagsCounter(RecipeDef recipe) 
+            => recipe.ProducedThingDef?.HasComp<CompIngredients>() ?? false;
+
+        public RecipeWorkerCounter_Abstract counter = null;
         public Bill_Production bill;
+
+        private bool useDefCounter;
 
         public string Label => counter?.Label ?? Strings.VanillaFilter;
 
@@ -28,7 +43,7 @@ namespace DoUntilFilter {
             
             var tooltip = row;
             tooltip.y -= tooltip.height;
-            counter?.Tooltip(tooltip, bill);
+            counter?.DoTooltip(tooltip, bill);
 
             Text.Anchor = TextAnchor.MiddleLeft;
             float width = Text.CalcSize(Strings.CountingFilter).x;
@@ -45,18 +60,24 @@ namespace DoUntilFilter {
             }
 
             if (Widgets.ButtonText(row, Label)) {
-                Find.WindowStack.Add(new FloatMenu(new List<FloatMenuOption> { 
-                        // Default
-                        new FloatMenuOption(Strings.VanillaFilter, () => counter = null),
-                        // Auto
-                        RecipeWorkerCounter_Auto.MenuOption(this),
-                        // Custom...
-                        RecipeWorkerCounter_Custom.MenuOption(this),
-                    }));
+                Find.WindowStack.Add(new FloatMenu([ 
+                    // Default
+                    new FloatMenuOption(Strings.VanillaFilter, () => counter = null),
+                    // Auto
+                    AutoMenuOption,
+                    // Custom...
+                    CustomMenuOption,
+                ]));
             }
 
             list.Gap(Margin);
         }
+
+        private FloatMenuOption AutoMenuOption
+            => useDefCounter ? RecipeWorkerCounter_DefAuto.MenuOption(this) : RecipeWorkerCounter_TagsAuto.MenuOption(this);
+
+        private FloatMenuOption CustomMenuOption
+            => useDefCounter ? RecipeWorkerCounter_DefCustom.MenuOption(this) : RecipeWorkerCounter_TagsCustom.MenuOption(this);
 
         public void CopyTo(Bill_Production bill) {
             var other = State.For(bill);
@@ -70,8 +91,9 @@ namespace DoUntilFilter {
         }
 
         public void ExposeData(Bill_Production bill) {
-            RecipeWorkerCounter_Abs.Look(ref counter, Strings.ID);
+            RecipeWorkerCounter_Abstract.Look(ref counter, Strings.ID);
             this.bill ??= bill;
+            useDefCounter = UsesDefCounter(bill.recipe);
         }
     }
 }
